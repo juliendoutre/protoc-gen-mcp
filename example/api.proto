@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package api.v1;
+
+option go_package = "pkg/v1";
+
+import "extension.proto";
+
+service HelloWorld {
+    option (mcp.server) = {};
+
+    rpc Greet(GreetRequest) returns (GreetResponse) {
+        option (mcp.method) = {};
+    };
+}
+
+message GreetRequest {
+    string name = 1;
+}
+
+message GreetResponse {
+    string greeting = 1;
+}
