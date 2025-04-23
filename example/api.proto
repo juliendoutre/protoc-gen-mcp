@@ -11,6 +11,7 @@ service HelloWorld {
         version: "1.0.0"
     };
 
+    // Say hi!
     rpc Greet(GreetRequest) returns (GreetResponse) {
         option (mcp.method) = {};
     };

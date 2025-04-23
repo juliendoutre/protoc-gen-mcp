@@ -13,7 +13,7 @@ func main() {
 
     {{ range .Tools }}
     {{ .Name }}Tool := mcp.NewTool("{{ .Name }}",
-        {{ if .Description }}mcp.Description("{{ .Description }}"),{{ end }}
+        {{ if .Description }}mcp.WithDescription("{{ .Description }}"),{{ end }}
     )
     s.AddTool({{ .Name }}Tool, nil)
     {{ end }}

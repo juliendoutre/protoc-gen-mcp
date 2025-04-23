@@ -1,11 +1,11 @@
 package main
 
 import (
+	_ "embed"
 	"flag"
 	"path"
+	"strings"
 	"text/template"
-
-	_ "embed"
 
 	"github.com/juliendoutre/protoc-gen-mcp/internal/pb"
 	"google.golang.org/protobuf/compiler/protogen"
@@ -34,8 +34,8 @@ func main() {
 		ParamFunc: flags.Set,
 	}
 
-	options.Run(func(p *protogen.Plugin) error {
-		for _, file := range p.Files {
+	options.Run(func(plugin *protogen.Plugin) error {
+		for _, file := range plugin.Files {
 			if !file.Generate {
 				continue
 			}
@@ -51,7 +51,7 @@ func main() {
 					continue
 				}
 
-				genFile := p.NewGeneratedFile(path.Join("mcp", service.GoName, "main.go"), "main")
+				genFile := plugin.NewGeneratedFile(path.Join("mcp", service.GoName, "main.go"), "main")
 
 				config := Config{
 					Name:    service.GoName,
@@ -72,7 +72,7 @@ func main() {
 
 					config.Tools = append(config.Tools, Tool{
 						Name:        method.GoName,
-						Description: method.Comments.Leading.String(),
+						Description: strings.TrimSpace(strings.TrimPrefix(method.Comments.Leading.String(), "//")),
 					})
 				}
 
