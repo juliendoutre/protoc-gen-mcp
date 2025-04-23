@@ -19,6 +19,12 @@ var mainTemplate string
 type Config struct {
 	Name    string
 	Version string
+	Tools   []Tool
+}
+
+type Tool struct {
+	Name        string
+	Description string
 }
 
 func main() {
@@ -50,10 +56,11 @@ func main() {
 				config := Config{
 					Name:    service.GoName,
 					Version: extension.GetVersion(),
+					Tools:   []Tool{},
 				}
 
 				for _, method := range service.Methods {
-					option, ok := method.Desc.Options().(*descriptorpb.ServiceOptions)
+					option, ok := method.Desc.Options().(*descriptorpb.MethodOptions)
 					if !ok || option == nil {
 						continue
 					}
@@ -62,6 +69,11 @@ func main() {
 					if !ok || extension == nil {
 						continue
 					}
+
+					config.Tools = append(config.Tools, Tool{
+						Name:        method.GoName,
+						Description: method.Comments.Leading.String(),
+					})
 				}
 
 				fileTemplate, err := template.New("main").Parse(mainTemplate)
