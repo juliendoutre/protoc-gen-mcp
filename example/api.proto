@@ -7,7 +7,9 @@ option go_package = "pkg/v1";
 import "extension.proto";
 
 service HelloWorld {
-    option (mcp.server) = {};
+    option (mcp.server) = {
+        version: "1.0.0"
+    };
 
     rpc Greet(GreetRequest) returns (GreetResponse) {
         option (mcp.method) = {};

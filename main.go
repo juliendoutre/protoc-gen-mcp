@@ -2,14 +2,24 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"os"
+	"path"
+	"text/template"
+
+	_ "embed"
 
 	"github.com/juliendoutre/protoc-gen-mcp/internal/pb"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
+
+//go:embed main.go.tpl
+var mainTemplate string
+
+type Config struct {
+	Name    string
+	Version string
+}
 
 func main() {
 	var flags flag.FlagSet
@@ -35,12 +45,12 @@ func main() {
 					continue
 				}
 
-				genFile := p.NewGeneratedFile(file.GeneratedFilenamePrefix+".txt", file.GoImportPath)
-				genFile.P("hello world")
+				genFile := p.NewGeneratedFile(path.Join("mcp", service.GoName, "main.go"), "main")
 
-				// TODO: create folder with main.go with skeletton for MCP server
-
-				fmt.Fprintln(os.Stderr, extension.String())
+				config := Config{
+					Name:    service.GoName,
+					Version: extension.GetVersion(),
+				}
 
 				for _, method := range service.Methods {
 					option, ok := method.Desc.Options().(*descriptorpb.ServiceOptions)
@@ -52,10 +62,15 @@ func main() {
 					if !ok || extension == nil {
 						continue
 					}
+				}
 
-					// TODO: register method and implement handler
+				fileTemplate, err := template.New("main").Parse(mainTemplate)
+				if err != nil {
+					panic(err)
+				}
 
-					fmt.Fprintln(os.Stderr, options)
+				if err := fileTemplate.ExecuteTemplate(genFile, "main", config); err != nil {
+					panic(err)
 				}
 			}
 		}
