@@ -3,7 +3,6 @@ package main
 import (
 	_ "embed"
 	"flag"
-	"path"
 	"strings"
 	"text/template"
 
@@ -13,13 +12,18 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
+var version = "unknown"
+
 //go:embed main.go.tpl
 var mainTemplate string
 
 type Config struct {
-	Name    string
-	Version string
-	Tools   []Tool
+	Source        string
+	PluginVersion string
+	GoPackageName string
+	Name          string
+	Version       string
+	Tools         []Tool
 }
 
 type Tool struct {
@@ -51,12 +55,15 @@ func main() {
 					continue
 				}
 
-				genFile := plugin.NewGeneratedFile(path.Join("mcp", service.GoName, "main.go"), "main")
+				genFile := plugin.NewGeneratedFile(file.GeneratedFilenamePrefix+"_mcp.pb.go", file.GoImportPath)
 
 				config := Config{
-					Name:    service.GoName,
-					Version: extension.GetVersion(),
-					Tools:   []Tool{},
+					PluginVersion: version,
+					Source:        file.Proto.GetSourceCodeInfo().ProtoReflect().Descriptor().ParentFile().Path(),
+					GoPackageName: string(file.GoPackageName),
+					Name:          service.GoName,
+					Version:       extension.GetVersion(),
+					Tools:         []Tool{},
 				}
 
 				for _, method := range service.Methods {

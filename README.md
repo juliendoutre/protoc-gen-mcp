@@ -4,7 +4,7 @@
 
 ```shell
 go install .
-protoc ./example/api.proto --mcp_out=./example/ -I./example/ -I./protos/
+protoc ./example/api.proto --mcp_out=./example/ --go_out=./example/ --go-grpc_out=./example/ -I./example/ -I./protos/
 ```
 
 ## Development
