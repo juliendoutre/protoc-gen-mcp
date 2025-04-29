@@ -113,14 +113,14 @@ var File_api_proto protoreflect.FileDescriptor
 
 const file_api_proto_rawDesc = "" +
 	"\n" +
-	"\tapi.proto\x12\x06api.v1\x1a\x0fextension.proto\"\"\n" +
+	"\tapi.proto\x1a\x0fextension.proto\"\"\n" +
 	"\fGreetRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\"+\n" +
 	"\rGreetResponse\x12\x1a\n" +
-	"\bgreeting\x18\x01 \x01(\tR\bgreeting2S\n" +
+	"\bgreeting\x18\x01 \x01(\tR\bgreeting2E\n" +
 	"\n" +
-	"HelloWorld\x129\n" +
-	"\x05Greet\x12\x14.api.v1.GreetRequest\x1a\x15.api.v1.GreetResponse\"\x03\xc2>\x00\x1a\n" +
+	"HelloWorld\x12+\n" +
+	"\x05Greet\x12\r.GreetRequest\x1a\x0e.GreetResponse\"\x03\xc2>\x00\x1a\n" +
 	"\xc2>\a\n" +
 	"\x051.0.0B\rZ\vinternal/pbb\x06proto3"
 
@@ -138,12 +138,12 @@ func file_api_proto_rawDescGZIP() []byte {
 
 var file_api_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_api_proto_goTypes = []any{
-	(*GreetRequest)(nil),  // 0: api.v1.GreetRequest
-	(*GreetResponse)(nil), // 1: api.v1.GreetResponse
+	(*GreetRequest)(nil),  // 0: GreetRequest
+	(*GreetResponse)(nil), // 1: GreetResponse
 }
 var file_api_proto_depIdxs = []int32{
-	0, // 0: api.v1.HelloWorld.Greet:input_type -> api.v1.GreetRequest
-	1, // 1: api.v1.HelloWorld.Greet:output_type -> api.v1.GreetResponse
+	0, // 0: HelloWorld.Greet:input_type -> GreetRequest
+	1, // 1: HelloWorld.Greet:output_type -> GreetResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

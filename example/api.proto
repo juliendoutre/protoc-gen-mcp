@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package api.v1;
-
 option go_package = "internal/pb";
 
 import "extension.proto";

@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"flag"
+	"fmt"
 	"strings"
 	"text/template"
 
@@ -12,12 +13,14 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
-var version = "unknown"
+var version = "(unknown)"
 
 //go:embed main.go.tpl
 var mainTemplate string
 
 type Config struct {
+	SourcePath    string
+	ProtocVersion string
 	PluginVersion string
 	GoPackageName string
 	Name          string
@@ -58,6 +61,8 @@ func main() {
 				genFile := plugin.NewGeneratedFile(file.GeneratedFilenamePrefix+"_mcp.pb.go", file.GoImportPath)
 
 				config := Config{
+					SourcePath:    file.Desc.Path(),
+					ProtocVersion: protocVersion(plugin),
 					PluginVersion: version,
 					GoPackageName: string(file.GoPackageName),
 					Name:          service.GoName,
@@ -96,4 +101,18 @@ func main() {
 
 		return nil
 	})
+}
+
+func protocVersion(gen *protogen.Plugin) string {
+	v := gen.Request.GetCompilerVersion()
+	if v == nil {
+		return "(unknown)"
+	}
+
+	var suffix string
+	if s := v.GetSuffix(); s != "" {
+		suffix = "-" + s
+	}
+
+	return fmt.Sprintf("v%d.%d.%d%s", v.GetMajor(), v.GetMinor(), v.GetPatch(), suffix)
 }
