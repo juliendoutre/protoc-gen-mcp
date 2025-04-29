@@ -104,15 +104,15 @@ func main() {
 }
 
 func protocVersion(gen *protogen.Plugin) string {
-	v := gen.Request.GetCompilerVersion()
-	if v == nil {
+	version := gen.Request.GetCompilerVersion()
+	if version == nil {
 		return "(unknown)"
 	}
 
 	var suffix string
-	if s := v.GetSuffix(); s != "" {
+	if s := version.GetSuffix(); s != "" {
 		suffix = "-" + s
 	}
 
-	return fmt.Sprintf("v%d.%d.%d%s", v.GetMajor(), v.GetMinor(), v.GetPatch(), suffix)
+	return fmt.Sprintf("v%d.%d.%d%s", version.GetMajor(), version.GetMinor(), version.GetPatch(), suffix)
 }
