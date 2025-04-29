@@ -11,6 +11,7 @@ import (
 
 	"github.com/mark3labs/mcp-go/server"
 	"github.com/mark3labs/mcp-go/mcp"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func NewHelloWorldMCPServer(client HelloWorldClient) *server.MCPServer {
@@ -23,7 +24,14 @@ func NewHelloWorldMCPServer(client HelloWorldClient) *server.MCPServer {
 		mcp.WithDescription("Say hi!"),
 	)
 	s.AddTool(GreetTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		return nil, nil
+		in := &GreetRequest{}
+
+		out, err := client.Greet(ctx, in)
+		if err != nil {
+			return mcp.NewToolResultError(err.Error()), nil
+		}
+
+		return mcp.NewToolResultText(protojson.Format(out)), nil
 	})
 
 	return s

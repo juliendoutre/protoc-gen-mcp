@@ -10,7 +10,8 @@ import (
     {{ if .Tools }}"context"
     {{ end }}
     "github.com/mark3labs/mcp-go/server"
-    {{ if .Tools }}"github.com/mark3labs/mcp-go/mcp"{{ end }}
+    {{ if .Tools }}"github.com/mark3labs/mcp-go/mcp"
+    "google.golang.org/protobuf/encoding/protojson"{{ end }}
 )
 
 func New{{.Name}}MCPServer(client {{ .Name }}Client) *server.MCPServer {
@@ -24,7 +25,14 @@ func New{{.Name}}MCPServer(client {{ .Name }}Client) *server.MCPServer {
         {{ if .Description }}mcp.WithDescription("{{ .Description }}"),{{ end }}
     )
     s.AddTool({{ .Name }}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-        return nil, nil
+        in := &{{ .InputMessageName }}{}
+
+        out, err := client.{{ .Name }}(ctx, in)
+        if err != nil {
+            return mcp.NewToolResultError(err.Error()), nil
+        }
+
+        return mcp.NewToolResultText(protojson.Format(out)), nil
     })
     {{ end }}
 

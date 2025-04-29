@@ -18,7 +18,6 @@ var version = "unknown"
 var mainTemplate string
 
 type Config struct {
-	Source        string
 	PluginVersion string
 	GoPackageName string
 	Name          string
@@ -27,8 +26,9 @@ type Config struct {
 }
 
 type Tool struct {
-	Name        string
-	Description string
+	Name             string
+	Description      string
+	InputMessageName string
 }
 
 func main() {
@@ -59,7 +59,6 @@ func main() {
 
 				config := Config{
 					PluginVersion: version,
-					Source:        file.Proto.GetSourceCodeInfo().ProtoReflect().Descriptor().ParentFile().Path(),
 					GoPackageName: string(file.GoPackageName),
 					Name:          service.GoName,
 					Version:       extension.GetVersion(),
@@ -78,8 +77,9 @@ func main() {
 					}
 
 					config.Tools = append(config.Tools, Tool{
-						Name:        method.GoName,
-						Description: strings.TrimSpace(strings.TrimPrefix(method.Comments.Leading.String(), "//")),
+						Name:             method.GoName,
+						Description:      strings.TrimSpace(strings.TrimPrefix(method.Comments.Leading.String(), "//")),
+						InputMessageName: method.Input.GoIdent.GoName,
 					})
 				}
 
