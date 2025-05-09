@@ -21,7 +21,9 @@ func NewHelloWorldMCPServer(client HelloWorldClient) *server.MCPServer {
 
 	GreetTool := mcp.NewTool("Greet")
 	s.AddTool(GreetTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		in := &GreetRequest{}
+		in := &GreetRequest{
+			Name: request.Params.Arguments["Name"].(string),
+		}
 
 		out, err := client.Greet(ctx, in)
 		if err != nil {

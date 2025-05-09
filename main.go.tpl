@@ -23,7 +23,11 @@ func New{{.Name}}MCPServer(client {{ .Name }}Client) *server.MCPServer {
     {{ range .Methods }}
     {{ .Name }}Tool := mcp.NewTool("{{ .Name }}")
     s.AddTool({{ .Name }}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-        in := &{{ .Input.Name }}{}
+        in := &{{ .Input.Name }}{
+        {{- range .Input.Fields }}
+            {{ .Name }}: request.Params.Arguments["{{ .Name }}"].({{ if .IsPointer }}*{{ end }}{{ .Type }}),
+        {{ end }}
+        }
 
         out, err := client.{{ .Name }}(ctx, in)
         if err != nil {
