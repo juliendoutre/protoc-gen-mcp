@@ -133,9 +133,13 @@ func protocVersion(gen *protogen.Plugin) string {
 	return fmt.Sprintf("v%d.%d.%d%s", version.GetMajor(), version.GetMinor(), version.GetPatch(), suffix)
 }
 
+//nolint:lll
 // Taken from https://github.com/protocolbuffers/protobuf-go/blob/1a3946737f2cd954c76cd035fa6968468f568b6a/cmd/protoc-gen-go/internal_gengo/main.go#L647
+
+//nolint:cyclop,nonamedreturns,varnamelen
 func fieldGoType(g *protogen.GeneratedFile, field *protogen.Field) (goType string, pointer bool) {
 	pointer = field.Desc.HasPresence()
+
 	switch field.Desc.Kind() {
 	case protoreflect.BoolKind:
 		goType = "bool"
@@ -162,13 +166,16 @@ func fieldGoType(g *protogen.GeneratedFile, field *protogen.Field) (goType strin
 		goType = "*" + g.QualifiedGoIdent(field.Message.GoIdent)
 		pointer = false // pointer captured as part of the type
 	}
+
 	switch {
 	case field.Desc.IsList():
 		return "[]" + goType, false
 	case field.Desc.IsMap():
 		keyType, _ := fieldGoType(g, field.Message.Fields[0])
 		valType, _ := fieldGoType(g, field.Message.Fields[1])
+
 		return fmt.Sprintf("map[%v]%v", keyType, valType), false
 	}
+
 	return goType, pointer
 }
