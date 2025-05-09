@@ -4,13 +4,10 @@ import (
 	_ "embed"
 	"flag"
 	"fmt"
-	"strings"
 	"text/template"
 
-	"github.com/juliendoutre/protoc-gen-mcp/internal/pb"
 	"google.golang.org/protobuf/compiler/protogen"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/types/pluginpb"
 )
 
 var version = "(unknown)"
@@ -23,15 +20,16 @@ type Config struct {
 	ProtocVersion string
 	PluginVersion string
 	GoPackageName string
-	Name          string
-	Version       string
-	Tools         []Tool
+	Services      []Service
 }
 
-type Tool struct {
-	Name             string
-	Description      string
-	InputMessageName string
+type Service struct {
+	Name    string
+	Methods []Method
+}
+
+type Method struct {
+	Name string
 }
 
 func main() {
@@ -42,65 +40,56 @@ func main() {
 	}
 
 	options.Run(func(plugin *protogen.Plugin) error {
-		for _, file := range plugin.Files {
-			if !file.Generate {
-				continue
-			}
+		plugin.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
 
-			for _, service := range file.Services {
-				option, ok := service.Desc.Options().(*descriptorpb.ServiceOptions)
-				if !ok || option == nil {
-					continue
-				}
+		return run(plugin)
+	})
+}
 
-				extension, ok := proto.GetExtension(option, pb.E_Server).(*pb.MCPServiceOption)
-				if !ok || extension == nil {
-					continue
-				}
-
-				genFile := plugin.NewGeneratedFile(file.GeneratedFilenamePrefix+"_mcp.pb.go", file.GoImportPath)
-
-				config := Config{
-					SourcePath:    file.Desc.Path(),
-					ProtocVersion: protocVersion(plugin),
-					PluginVersion: version,
-					GoPackageName: string(file.GoPackageName),
-					Name:          service.GoName,
-					Version:       extension.GetVersion(),
-					Tools:         []Tool{},
-				}
-
-				for _, method := range service.Methods {
-					option, ok := method.Desc.Options().(*descriptorpb.MethodOptions)
-					if !ok || option == nil {
-						continue
-					}
-
-					extension, ok := proto.GetExtension(option, pb.E_Method).(*pb.MCPMethodOption)
-					if !ok || extension == nil {
-						continue
-					}
-
-					config.Tools = append(config.Tools, Tool{
-						Name:             method.GoName,
-						Description:      strings.TrimSpace(strings.TrimPrefix(method.Comments.Leading.String(), "//")),
-						InputMessageName: method.Input.GoIdent.GoName,
-					})
-				}
-
-				fileTemplate, err := template.New("main").Parse(mainTemplate)
-				if err != nil {
-					panic(err)
-				}
-
-				if err := fileTemplate.ExecuteTemplate(genFile, "main", config); err != nil {
-					panic(err)
-				}
-			}
+func run(plugin *protogen.Plugin) error {
+	for _, file := range plugin.Files {
+		if !file.Generate {
+			continue
 		}
 
-		return nil
-	})
+		config := Config{
+			SourcePath:    file.Desc.Path(),
+			ProtocVersion: protocVersion(plugin),
+			PluginVersion: version,
+			GoPackageName: string(file.GoPackageName),
+			Services:      []Service{},
+		}
+
+		for _, service := range file.Services {
+			serviceTemplate := Service{
+				Name:    service.GoName,
+				Methods: []Method{},
+			}
+
+			for _, method := range service.Methods {
+				methodTemplate := Method{
+					Name: method.GoName,
+				}
+
+				serviceTemplate.Methods = append(serviceTemplate.Methods, methodTemplate)
+			}
+
+			config.Services = append(config.Services, serviceTemplate)
+		}
+
+		fileTemplate, err := template.New("main").Parse(mainTemplate)
+		if err != nil {
+			return fmt.Errorf("parsing template: %w", err)
+		}
+
+		genFile := plugin.NewGeneratedFile(file.GeneratedFilenamePrefix+"_mcp.pb.go", file.GoImportPath)
+
+		if err := fileTemplate.ExecuteTemplate(genFile, "main", config); err != nil {
+			return fmt.Errorf("executing template: %w", err)
+		}
+	}
+
+	return nil
 }
 
 func protocVersion(gen *protogen.Plugin) string {

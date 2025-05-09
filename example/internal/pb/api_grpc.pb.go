@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.29.3
-// source: api.proto
+// source: example/api.proto
 
 package pb
 
@@ -26,7 +26,6 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type HelloWorldClient interface {
-	// Say hi!
 	Greet(ctx context.Context, in *GreetRequest, opts ...grpc.CallOption) (*GreetResponse, error)
 }
 
@@ -52,7 +51,6 @@ func (c *helloWorldClient) Greet(ctx context.Context, in *GreetRequest, opts ...
 // All implementations must embed UnimplementedHelloWorldServer
 // for forward compatibility.
 type HelloWorldServer interface {
-	// Say hi!
 	Greet(context.Context, *GreetRequest) (*GreetResponse, error)
 	mustEmbedUnimplementedHelloWorldServer()
 }
@@ -119,5 +117,5 @@ var HelloWorld_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api.proto",
+	Metadata: "example/api.proto",
 }

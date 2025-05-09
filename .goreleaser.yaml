@@ -5,7 +5,7 @@ before:
     - go mod tidy
 
 builds:
-  - binary: protoc-gen-mcp
+  - binary: protoc-gen-go-mcp
     env:
       - CGO_ENABLED=0
     goos:
@@ -47,19 +47,19 @@ signs:
       - --yes
 
 brews:
-- name: protoc-gen-mcp
+- name: protoc-gen-go-mcp
   repository:
     owner: juliendoutre
-    name: protoc-gen-mcp
+    name: protoc-gen-go-mcp
     branch: "homebrew-update-{{ .Version	}}"
     pull_request:
       enabled: true
       base:
         owner: juliendoutre
-        name: protoc-gen-mcp
+        name: protoc-gen-go-mcp
         branch: main
   directory: Formula
-  url_template: "https://github.com/juliendoutre/protoc-gen-mcp/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+  url_template: "https://github.com/juliendoutre/protoc-gen-go-mcp/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
   dependencies:
     - name: mkcert
       version: 1.4.4

@@ -2,17 +2,8 @@ syntax = "proto3";
 
 option go_package = "internal/pb";
 
-import "extension.proto";
-
 service HelloWorld {
-    option (mcp.server) = {
-        version: "1.0.0"
-    };
-
-    // Say hi!
-    rpc Greet(GreetRequest) returns (GreetResponse) {
-        option (mcp.method) = {};
-    };
+    rpc Greet(GreetRequest) returns (GreetResponse) {}
 }
 
 message GreetRequest {

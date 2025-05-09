@@ -1,4 +1,4 @@
-module github.com/juliendoutre/protoc-gen-mcp
+module github.com/juliendoutre/protoc-gen-go-mcp
 
 go 1.24.2
 

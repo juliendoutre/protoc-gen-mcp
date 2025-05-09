@@ -1,26 +1,52 @@
-# protoc-gen-mcp
+# protoc-gen-go-mcp
 
-## Prerequisites
+## Getting started
+
+```shell
+brew tap juliendoutre/protoc-gen-go-mcp https://github.com/juliendoutre/protoc-gen-go-mcp
+brew install protoc-gen-go-mcp
+```
+
+## Usage
 
 ```shell
 brew install protobuf
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+protoc ./example/api.proto --go_out=./example/ --go-grpc_out=./example/ --go-mcp_out=./example/
 ```
 
 ## Run the example
 
 ```shell
-go install .
-protoc ./example/api.proto --mcp_out=./example/ --go_out=./example/ --go-grpc_out=./example/ -I./example/ -I./protos/
+cd example && go run .
+# In another shell
+grpcurl -plaintext localhost:8000 HelloWorld/Greet
 ```
 
 ## Development
 
-## Regenerate the extension protobuf
+### Lint the code
 
 ```shell
-protoc ./protos/extension.proto --go_out=. --go-grpc_out=.
+brew install golangci-lint
+golangci-lint run
+```
+
+### Release a new version
+
+```shell
+git tag -a v0.1.0 -m "New release"
+git push origin v0.1.0
+```
+
+### Update the example generated code
+
+```shell
+brew tap juliendoutre/protoc-gen-go-mcp https://github.com/juliendoutre/protoc-gen-go-mcp
+brew install protoc-gen-go-mcp
+go install .
+protoc ./example/api.proto --go_out=./example/ --go-grpc_out=./example/ --go-random_out=./example/ --go-mcp_out=./example/
 ```
 
 ## References
