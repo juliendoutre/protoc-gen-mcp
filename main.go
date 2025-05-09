@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"flag"
 	"fmt"
+	"strings"
 	"text/template"
 
 	"google.golang.org/protobuf/compiler/protogen"
@@ -43,6 +44,7 @@ type Field struct {
 	Name      string
 	IsPointer bool
 	Type      string
+	MCPType   string
 }
 
 func main() {
@@ -96,6 +98,7 @@ func run(plugin *protogen.Plugin) error {
 					}
 
 					fieldTemplate.Type, fieldTemplate.IsPointer = fieldGoType(genFile, field)
+					fieldTemplate.MCPType = mcpType(fieldTemplate.Type)
 
 					methodTemplate.Input.Fields = append(methodTemplate.Input.Fields, fieldTemplate)
 				}
@@ -178,4 +181,22 @@ func fieldGoType(g *protogen.GeneratedFile, field *protogen.Field) (goType strin
 	}
 
 	return goType, pointer
+}
+
+func mcpType(goType string) string {
+	switch goType {
+	case "bool":
+		return "Boolean"
+	case "int32", "uint32", "int64", "uint64", "float32", "float64":
+		return "Number"
+	case "string":
+		return "String"
+	}
+
+	goType, isArray := strings.CutPrefix(goType, "[]")
+	if isArray {
+		return "Array"
+	}
+
+	return "Object"
 }

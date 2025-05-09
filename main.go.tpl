@@ -24,7 +24,7 @@ func New{{.Name}}MCPServer(client {{ .Name }}Client) *server.MCPServer {
     {{ .Name }}Tool := mcp.NewTool(
         "{{ .Name }}",
         {{- range .Input.Fields }}
-        mcp.WithString("{{ .Name }}"),
+        mcp.With{{ .MCPType }}("{{ .Name }}"),
         {{ end }}
     )
 
