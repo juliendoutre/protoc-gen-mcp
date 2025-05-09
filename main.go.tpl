@@ -21,7 +21,13 @@ func New{{.Name}}MCPServer(client {{ .Name }}Client) *server.MCPServer {
     )
 
     {{ range .Methods }}
-    {{ .Name }}Tool := mcp.NewTool("{{ .Name }}")
+    {{ .Name }}Tool := mcp.NewTool(
+        "{{ .Name }}",
+        {{- range .Input.Fields }}
+        mcp.WithString("{{ .Name }}"),
+        {{ end }}
+    )
+
     s.AddTool({{ .Name }}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
         in := &{{ .Input.Name }}{
         {{- range .Input.Fields }}

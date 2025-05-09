@@ -19,10 +19,25 @@ protoc ./example/api.proto --go_out=./example/ --go-grpc_out=./example/ --go-mcp
 ## Run the example
 
 ```shell
-cd example && go run .
-# In another shell
-grpcurl -plaintext localhost:8000 HelloWorld/Greet
+cd example/cmd/mcp && go install .
+cd ../../../example/cmd/server && go run .
 ```
+
+Open your favorite IDE and add the MCP to your config. For instance in Cursor:
+```json
+// ~/.cursor/mcp.json
+{
+  "mcpServers": {
+    "example": {
+      "command": "mcp",
+      "args": [],
+      "env": {}
+    }
+  }
+}
+```
+
+Then ask in the chat something along the lines of "My name is Julien, can you get a greeting for me please?". The LLM should request the example MCP server.
 
 ## Development
 
@@ -43,10 +58,8 @@ git push origin v0.1.0
 ### Update the example generated code
 
 ```shell
-brew tap juliendoutre/protoc-gen-go-mcp https://github.com/juliendoutre/protoc-gen-go-mcp
-brew install protoc-gen-go-mcp
 go install .
-protoc ./example/api.proto --go_out=./example/ --go-grpc_out=./example/ --go-random_out=./example/ --go-mcp_out=./example/
+protoc ./example/api.proto --go_out=./example/ --go-grpc_out=./example/ --go-mcp_out=./example/
 ```
 
 ## References

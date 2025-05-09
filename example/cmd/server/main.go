@@ -1,12 +1,11 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
-	"math/rand"
 	"net"
-	"time"
 
 	"github.com/juliendoutre/protoc-gen-go-mcp/example/internal/pb"
 	"google.golang.org/grpc"
@@ -22,12 +21,16 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	randomServer := &pb.HelloWorldRandomServer{
-		Rand: rand.New(rand.NewSource(time.Now().Unix())),
-	}
-
 	grpcServer := grpc.NewServer()
 	reflection.Register(grpcServer)
-	pb.RegisterHelloWorldServer(grpcServer, randomServer)
+	pb.RegisterHelloWorldServer(grpcServer, &server{})
 	grpcServer.Serve(lis)
+}
+
+type server struct {
+	pb.UnimplementedHelloWorldServer
+}
+
+func (s *server) Greet(ctx context.Context, in *pb.GreetRequest) (*pb.GreetResponse, error) {
+	return &pb.GreetResponse{Greeting: fmt.Sprintf("Hello %s!", in.GetName())}, nil
 }
