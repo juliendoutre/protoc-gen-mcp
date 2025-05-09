@@ -13,4 +13,23 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-// TODO
+func NewHelloWorldMCPServer(client HelloWorldClient) *server.MCPServer {
+	s := server.NewMCPServer(
+		"HelloWorld",
+		"unknown",
+	)
+
+	GreetTool := mcp.NewTool("Greet")
+	s.AddTool(GreetTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		in := &GreetRequest{}
+
+		out, err := client.Greet(ctx, in)
+		if err != nil {
+			return mcp.NewToolResultError(err.Error()), nil
+		}
+
+		return mcp.NewToolResultText(protojson.Format(out)), nil
+	})
+
+	return s
+}

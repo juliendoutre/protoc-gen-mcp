@@ -29,6 +29,11 @@ type Service struct {
 }
 
 type Method struct {
+	Name  string
+	Input Input
+}
+
+type Input struct {
 	Name string
 }
 
@@ -69,6 +74,9 @@ func run(plugin *protogen.Plugin) error {
 			for _, method := range service.Methods {
 				methodTemplate := Method{
 					Name: method.GoName,
+					Input: Input{
+						Name: method.Input.GoIdent.GoName,
+					},
 				}
 
 				serviceTemplate.Methods = append(serviceTemplate.Methods, methodTemplate)

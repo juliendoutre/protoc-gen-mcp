@@ -14,5 +14,26 @@ import (
 )
 
 {{ range $service := .Services }}
-// TODO
+func New{{.Name}}MCPServer(client {{ .Name }}Client) *server.MCPServer {
+    s := server.NewMCPServer(
+        "{{ .Name }}",
+        "unknown",
+    )
+
+    {{ range .Methods }}
+    {{ .Name }}Tool := mcp.NewTool("{{ .Name }}")
+    s.AddTool({{ .Name }}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+        in := &{{ .Input.Name }}{}
+
+        out, err := client.{{ .Name }}(ctx, in)
+        if err != nil {
+            return mcp.NewToolResultError(err.Error()), nil
+        }
+
+        return mcp.NewToolResultText(protojson.Format(out)), nil
+    })
+    {{ end }}
+
+   return s
+}
 {{ end }}
